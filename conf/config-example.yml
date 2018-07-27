@@ -1,0 +1,16 @@
+# tcp_addr: ":8070"
+# tcp_tls_addr: ":8073,conf/cert.pem,conf/key.pem"
+
+http_addr: ":80"
+# https_addr: ":443,conf/cert.pem,conf/key.pem"
+keepalive: "5s"
+
+admin_addr: ":8610"
+
+# conn_check_url": "http://localhost/check"
+# store:
+#     name: "redis"
+#     host: "localhost:6379"
+#     db: 0
+#     events_key: "online-events"
+#     list_key_prefix: "list-"

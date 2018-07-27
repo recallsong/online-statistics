@@ -22,8 +22,9 @@
         }
         var host = getQueryParam('host');
         host = host ? host : window.location.hostname;
+        var topicIdx = 0;
         var sc = new StatisticsConn(host + '/wsconn', {
-            id: new Date().getTime() + '',
+            topic: 'topic_' + (topicIdx++%5),
             token: Math.round(Math.random() * 100000000) + '',
             onconnected: function () {
                 var msg = document.getElementById('message');

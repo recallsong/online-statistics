@@ -10,7 +10,7 @@ function StatisticsConn(url, options) {
         data_opts: { type: "application/octet-stream" },
         status: 0,
         keepalive: 5000,
-        id: options.id,
+        topic: options.topic,
         token: options.token,
         onopen: options.onopen,
         onconnected: options.onconnected,
@@ -59,7 +59,7 @@ function StatisticsConn(url, options) {
         })
     }
     function connect() {
-        var playload = connectPkg(opts.id, opts.token, window.location.host);
+        var playload = connectPkg(opts.topic, opts.token, window.location.host);
         ws.send(playload);
     }
 
@@ -84,13 +84,13 @@ function StatisticsConn(url, options) {
             }
         }
     }
-    function connectPkg(id, token, domain) {
+    function connectPkg(topic, token, domain) {
         var buffer = new ArrayBuffer(8);
         var view = new DataView(buffer);
         view.setUint16(0, opts.version, false);
         view.setUint8(2, 1, false);
         view.setUint8(3, 0, false);
-        var data = JSON.stringify({ id: id, token: token, domain: domain });
+        var data = JSON.stringify({ topic: topic, token: token, domain: domain });
         view.setUint32(4, data.length, false);
         return new Blob([buffer, data], opts.data_opts);
     }

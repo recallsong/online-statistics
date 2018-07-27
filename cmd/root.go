@@ -44,8 +44,8 @@ var (
 			fs.StringVar(&svrCfg.HttpAddr, "http_addr", "", "http server listen at this address")
 			fs.StringVar(&svrCfg.HttpsAddr, "https_addr", "", "https server listen at this address")
 			fs.StringVar(&svrCfg.AdminAddr, "admin_addr", "", "admin http server listen at this address")
-			fs.StringVar(&svrCfg.ConnCheckUrl, "conn_check_url", "", "url for check connect")
 			fs.DurationVar(&svrCfg.KeepAlive, "keepalive", 5*time.Second, "keepalive for connect read timeout")
+			fs.StringVar(&svrCfg.ConnCheckUrl, "conn_check_url", "", "url for check connect")
 			viper.BindPFlags(fs)
 		},
 		Run: func(cmd *cobra.Command, args []string) {

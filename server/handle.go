@@ -58,8 +58,7 @@ func (s *Server) onConn(conn net.Conn) {
 		cc.SetNoDelay(true)
 	}
 	keepalive := s.cfg.KeepAlive * 2
-	reader := conn // bufio.NewReader(conn)
-	writer := conn // bufio.NewWriter(conn)
+	reader, writer := conn, conn
 	buffer := make([]byte, 1024, 1024)
 	addr := conn.RemoteAddr().String()
 
@@ -82,7 +81,7 @@ func (s *Server) onConn(conn net.Conn) {
 	}
 	err = s.checkConn(addr, connpkg)
 	if err != nil {
-		log.Errorf("[conn] fail to check , addr:%s , id:%s , tkn:%s , dmn:%s", addr, connpkg.Id, connpkg.Token, connpkg.Domain)
+		log.Errorf("[conn] fail to check , addr:%s , topic:%s , tkn:%s , dmn:%s", addr, connpkg.Topic, connpkg.Token, connpkg.Domain)
 		closeConn(conn)
 		return
 	}
@@ -122,16 +121,22 @@ func (s *Server) onConnEvent(addr string, conn *Conn) {
 	s.connsLock.Lock()
 	s.conns[addr] = conn
 	s.connsLock.Unlock()
-	log.Infof("[conn] %s connected, id:%s, tkn:%s, dmn:%s", addr, conn.Pkg.Id, conn.Pkg.Token, conn.Pkg.Domain)
-	s.notifyToAdminPage(addr, conn, "add")
+	log.Infof("[conn] %s connected, topic:%s, tkn:%s, dmn:%s", addr, conn.Pkg.Topic, conn.Pkg.Token, conn.Pkg.Domain)
+	s.notifyToAdminPage(addr, conn, "online")
+	if s.store != nil {
+		s.pushOnlineEvent(addr, conn)
+	}
 }
 
 func (s *Server) onCloseEvent(addr string, conn *Conn) {
 	s.connsLock.Lock()
 	delete(s.conns, addr)
 	s.connsLock.Unlock()
-	log.Infof("[conn] %s disconnected, id:%s, tkn:%s, dmn:%s", addr, conn.Pkg.Id, conn.Pkg.Token, conn.Pkg.Domain)
-	s.notifyToAdminPage(addr, conn, "remove")
+	log.Infof("[conn] %s disconnected, topic:%s, tkn:%s, dmn:%s", addr, conn.Pkg.Topic, conn.Pkg.Token, conn.Pkg.Domain)
+	s.notifyToAdminPage(addr, conn, "offline")
+	if s.store == nil {
+		s.pushOfflineEvent(addr, conn)
+	}
 }
 
 var errConnCheckFail = errors.New("connect check failed")

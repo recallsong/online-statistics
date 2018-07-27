@@ -11,6 +11,7 @@ import (
 	"github.com/recallsong/go-utils/errorx"
 	"github.com/recallsong/go-utils/net/echox"
 	"github.com/recallsong/go-utils/net/servegrp"
+	"github.com/recallsong/online-statistics/server/store"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -24,6 +25,7 @@ type Server struct {
 	conns        map[string]*Conn
 	connsLock    sync.RWMutex
 	connNum      int32
+	store        store.Store
 }
 
 func New(cfg *Config) *Server {
@@ -36,6 +38,7 @@ func New(cfg *Config) *Server {
 		svr:      echox.New(),
 		conns:    make(map[string]*Conn),
 		watchers: make(map[string]*websocket.Conn),
+		store:    newStore(cfg.Store),
 	}
 }
 

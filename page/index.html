@@ -62,7 +62,7 @@
     <thead>
       <tr>
         <th>Address</th>
-        <th>Id</th>
+        <th>Topic</th>
         <th>Token</th>
         <th>Domain</th>
         <th>StartOn</th>
@@ -88,7 +88,7 @@
     function addOnlineItem(item) {
       var elem = $('<tr id="' + md5(item.addr) + '">\
                         <td>' + $("<div/>").text(item.addr).html() + '</td>\
-                        <td>' + $("<div/>").text(item.id).html() + '</td>\
+                        <td>' + $("<div/>").text(item.topic).html() + '</td>\
                         <td>' + $("<div/>").text(item.token).html() + '</td>\
                         <td>' + $("<div/>").text(item.domain).html() + '</td>\
                         <td>' + new Date(item.startOn).toLocaleString() + '</td>\
@@ -140,9 +140,9 @@
       ws.onmessage = function (evt) {
         var data = JSON.parse(evt.data);
         var item = data.item;
-        if (data.action == "add") {
+        if (data.action == "online") {
           addOnlineItem(item);
-        } else if (data.action == "remove") {
+        } else if (data.action == "offline") {
           $("#" + md5(item.addr)).remove();
         }
       }

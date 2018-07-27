@@ -23,7 +23,7 @@ func (s *Server) initAdminRoutes(svr *echox.EchoServer) {
 
 type connInfo struct {
 	Addr    string `json:"addr"`
-	Id      string `json:"id"`
+	Topic   string `json:"topic"`
 	Token   string `json:"token"`
 	Domain  string `json:"domain"`
 	StartOn int64  `json:"startOn"`
@@ -36,7 +36,7 @@ func (s *Server) httpShowClients(c echo.Context) error {
 	for k, v := range s.conns {
 		list[i] = &connInfo{
 			Addr:    k,
-			Id:      v.Pkg.Id,
+			Topic:   v.Pkg.Topic,
 			Token:   v.Pkg.Token,
 			Domain:  v.Pkg.Domain,
 			StartOn: v.StartOn.UnixNano() / 1000000,
@@ -77,7 +77,7 @@ func (s *Server) httpCloseClient(c echo.Context) error {
 		return c.JSON(200, dic.Dic{
 			"data": connInfo{
 				Addr:    addr,
-				Id:      conn.Pkg.Id,
+				Topic:   conn.Pkg.Topic,
 				Token:   conn.Pkg.Token,
 				Domain:  conn.Pkg.Domain,
 				StartOn: conn.StartOn.UnixNano() / 1000000,
@@ -98,7 +98,7 @@ func (s *Server) notifyToAdminPage(addr string, conn *Conn, atcion string) {
 		"action": atcion,
 		"item": &connInfo{
 			Addr:    addr,
-			Id:      conn.Pkg.Id,
+			Topic:   conn.Pkg.Topic,
 			Token:   conn.Pkg.Token,
 			Domain:  conn.Pkg.Domain,
 			StartOn: conn.StartOn.UnixNano() / 1000000,

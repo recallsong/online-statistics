@@ -1,9 +1,0 @@
-{
-    "tcp_addr": ":8600",
-    "tcp_tls_addr": ":8601,conf/cert.pem,conf/key.pem",
-    "http_addr": ":8600",
-    "https_addr": ":443,conf/cert.pem,conf/key.pem",
-    "admin_addr": ":8610",
-    "keepalive": "5s",
-    "conn_check_url": ""
-}

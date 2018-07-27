@@ -29,7 +29,7 @@ type pkgHeader struct {
 }
 
 type connectPkg struct {
-	Id     string `json:"id"`
+	Topic  string `json:"topic"`
 	Token  string `json:"token"`
 	Domain string `json:"domain"`
 }
