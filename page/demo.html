@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,height=device-height,initial-scale=1.0,user-scalable=0">
+    <title>在线统计测试页面</title>
+    <script src="/admin/static/conn.js"></script>
+</head>
+
+<body>
+    <h4 id="message"></h4>
+    <p id="tick"></p>
+    <script>
+        var cindex = 0, colors = ["red", "orange", "black", "green", "blue", "indigo", "purple", "brown", "blueviolet"];
+        function getQueryParam(name) {
+            var result = location.search.match(new RegExp("[\?\&]" + name + "=([^\&]+)", "i"));
+            if (result == null || result.length < 1) {
+                return "";
+            }
+            return decodeURIComponent(result[1]);
+        }
+        var host = getQueryParam('host');
+        host = host ? host : window.location.hostname;
+        var sc = new StatisticsConn(host + '/wsconn', {
+            id: new Date().getTime() + '',
+            token: Math.round(Math.random() * 100000000) + '',
+            onconnected: function () {
+                var msg = document.getElementById('message');
+                msg.innerHTML = '开始计时!';
+                window.document.title = '开始计时';
+            },
+            onheartbeat: function () {
+                var tick = document.getElementById('tick');
+                var color = colors[cindex++ % colors.length];
+                tick.innerHTML += '<span style="color:' + color + '">.<span>';
+            },
+            onclose: function () {
+                var out = document.getElementById('message');
+                out.innerHTML = '结束计时!';
+                window.document.title = '结束计时';
+            }
+        });
+    </script>
+</body>
+
+</html>

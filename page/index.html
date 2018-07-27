@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,height=device-height,initial-scale=1.0,user-scalable=0">
+  <title>管理</title>
+  <link rel="stylesheet" href="/admin/static/bootstrap/3.3.7/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/admin/static/font-awesome/4.7.0/css/font-awesome.min.css">
+  <script src="/admin/static/jquery/2.2.4/jquery.min.js"></script>
+  <script src="/admin/static/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script src="/admin/static/md5/md5.min.js"></script>
+  <style>
+    .btn.active.focus,
+    .btn.active:focus,
+    .btn.focus,
+    .btn:active.focus,
+    .btn:active:focus,
+    .btn:focus {
+      outline: none !important;
+    }
+
+    .table>tbody>tr>td,
+    .table>tbody>tr>th,
+    .table>tfoot>tr>td,
+    .table>tfoot>tr>th,
+    .table>thead>tr>td,
+    .table>thead>tr>th {
+      vertical-align: middle;
+    }
+
+    .navbar {
+      margin-bottom: 0;
+    }
+
+    .alert {
+      margin: 4px 2px;
+    }
+
+    #online-list {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+
+<body>
+  <nav class="navbar navbar-default navbar-static-top" role="navigation">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <a class="navbar-brand" href="#">&nbsp;<i class="fa fa-cog fa-spin"></i>&nbsp;&nbsp;在线列表</a>
+      </div>
+      <form class="navbar-form navbar-left" action="/admin/demo.html" target="_blank">
+          <div class="form-group">
+              <input type="text" class="form-control" name="host" placeholder="连接地址" value="localhost:8600">
+          </div>
+          <button type="submit" class="btn btn-default">连接</button>
+      </form>
+    </div>
+  </nav>
+  <div id="message-list"></div>
+  <table id="online-list" class="table table-striped">
+    <thead>
+      <tr>
+        <th>Address</th>
+        <th>Id</th>
+        <th>Token</th>
+        <th>Domain</th>
+        <th>StartOn</th>
+        <th style="width: 60px">Action</th>
+      </tr>
+    </thead>
+    <tbody>
+    </tbody>
+  </table>
+  <script>
+    function MessageBox(text, type, duration) {
+      type = type || "warning";
+      duration = duration || 3000;
+      var item = $('<div class="alert alert-' + type + '">\
+          <a href="#" class="close" data-dismiss="alert">&times;</a>' +
+        $("<div/>").text(text).html() +
+        '</div>');
+      $("#message-list").append(item);
+      setTimeout(function () {
+        item.fadeOut("slow", item.remove);
+      }, duration);
+    }
+    function addOnlineItem(item) {
+      var elem = $('<tr id="' + md5(item.addr) + '">\
+                        <td>' + $("<div/>").text(item.addr).html() + '</td>\
+                        <td>' + $("<div/>").text(item.id).html() + '</td>\
+                        <td>' + $("<div/>").text(item.token).html() + '</td>\
+                        <td>' + $("<div/>").text(item.domain).html() + '</td>\
+                        <td>' + new Date(item.startOn).toLocaleString() + '</td>\
+                        <td>\
+                          <button type="button" class="btn btn-default btn-sm">关闭</button>\
+                        </td>\
+                      </tr>');
+      $("button", elem[0]).click(function () {
+        $.ajax({
+          url: "/api/clients?addr=" + encodeURIComponent(item.addr),
+          async: false,
+          type: "DELETE",
+          dataType: "json",
+          success: function (data, status) {
+            if (status == "success" && data.data) {
+              MessageBox("关闭连接成功.", "success");
+              elem.remove();
+            }
+          },
+          error: function (xhr, ts, et) {
+            MessageBox("关闭连接失败：" + xhr.status + " " + et);
+          }
+        })
+      });
+      $("#online-list tbody").append(elem);
+    }
+    $.ajax({
+      url: "/api/clients",
+      dataType: "json",
+      success: function (data, status) {
+        $("#online-list tbody").html("");
+        if (status == "success") {
+          var list = data.data.list;
+          for (var i = 0; i < list.length; i++) {
+            addOnlineItem(list[i]);
+          }
+        }
+      },
+      error: function (xhr, ts, et) {
+        MessageBox("请求在线列表数据失败：" + xhr.status + " " + et);
+      }
+    });
+    function startWatch() {
+      var uri = 'ws://' + window.location.host + "/api/clients/ws";
+      var ws = new WebSocket(uri);
+      ws.onopen = function () {
+        ws.send("watch");
+      }
+      ws.onmessage = function (evt) {
+        var data = JSON.parse(evt.data);
+        var item = data.item;
+        if (data.action == "add") {
+          addOnlineItem(item);
+        } else if (data.action == "remove") {
+          $("#" + md5(item.addr)).remove();
+        }
+      }
+      ws.onclose = function () {
+        MessageBox("WebSocket连接已经关闭.");
+      }
+    }
+    startWatch();
+    $("input[name=host]").val(window.location.hostname + ":8600");
+  </script>
+</body>
+
+</html>

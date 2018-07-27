@@ -1,0 +1,9 @@
+{
+    "tcp_addr": "",
+    "tcp_tls_addr": "",
+    "http_addr": ":80",
+    "https_addr": "",
+    "admin_addr": ":8610",
+    "keepalive": "5s",
+    "conn_check_url": ""
+}
