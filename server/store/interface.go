@@ -1,6 +1,6 @@
 package store
 
-type Event struct {
+type OnlineEvent struct {
 	Action  string `json:"action"`
 	Topic   string `json:"topic"`
 	StartOn int64  `json:"starton"`
@@ -9,7 +9,12 @@ type Event struct {
 	Domain  string `json:"domain"`
 }
 
+type OfflineEvent struct {
+	OnlineEvent
+	CloseOn int64 `json:"closeon"`
+}
+
 type Store interface {
-	Online(*Event) error
-	Offline(*Event) error
+	Online(*OnlineEvent) error
+	Offline(*OfflineEvent) error
 }

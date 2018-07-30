@@ -67,7 +67,7 @@ func NewStore(options map[string]interface{}) (store.Store, error) {
 	}, nil
 }
 
-func (rs *RedisStore) Online(evt *store.Event) error {
+func (rs *RedisStore) Online(evt *store.OnlineEvent) error {
 	conn := rs.pool.Get()
 	defer conn.Close()
 	if rs.pushEvents {
@@ -86,7 +86,7 @@ func (rs *RedisStore) Online(evt *store.Event) error {
 	return nil
 }
 
-func (rs *RedisStore) Offline(evt *store.Event) error {
+func (rs *RedisStore) Offline(evt *store.OfflineEvent) error {
 	conn := rs.pool.Get()
 	defer conn.Close()
 	if rs.pushEvents {

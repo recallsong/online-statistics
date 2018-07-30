@@ -1,6 +1,8 @@
 package server
 
 import (
+	"time"
+
 	"github.com/recallsong/go-utils/container/dic"
 	"github.com/recallsong/online-statistics/server/store"
 	redis "github.com/recallsong/online-statistics/server/store/redis-store"
@@ -25,7 +27,7 @@ func newStore(cfg map[string]interface{}) store.Store {
 }
 
 func (s *Server) pushOnlineEvent(addr string, conn *Conn) error {
-	err := s.store.Online(&store.Event{
+	err := s.store.Online(&store.OnlineEvent{
 		Action:  "online",
 		StartOn: conn.StartOn.UnixNano() / 1000000,
 		Topic:   conn.Pkg.Topic,
@@ -40,12 +42,15 @@ func (s *Server) pushOnlineEvent(addr string, conn *Conn) error {
 }
 
 func (s *Server) pushOfflineEvent(addr string, conn *Conn) error {
-	err := s.store.Offline(&store.Event{
-		Action:  "offline",
-		StartOn: conn.StartOn.UnixNano() / 1000000,
-		Topic:   conn.Pkg.Topic,
-		Token:   conn.Pkg.Token,
-		Domain:  conn.Pkg.Domain,
+	err := s.store.Offline(&store.OfflineEvent{
+		OnlineEvent: store.OnlineEvent{
+			Action:  "offline",
+			StartOn: conn.StartOn.UnixNano() / 1000000,
+			Topic:   conn.Pkg.Topic,
+			Token:   conn.Pkg.Token,
+			Domain:  conn.Pkg.Domain,
+		},
+		CloseOn: time.Now().UnixNano() / 1000000,
 	})
 	if err != nil {
 		log.Error("[queue] push offline event to store error : ", err)

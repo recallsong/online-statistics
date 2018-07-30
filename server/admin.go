@@ -15,6 +15,9 @@ import (
 
 func (s *Server) initAdminRoutes(svr *echox.EchoServer) {
 	svr.Static("/admin", "page")
+	svr.GET("/", func(c echo.Context) error {
+		return c.Redirect(301, "/admin/")
+	})
 	svr.GET("/api/clients/ws", s.httpWsListClients)
 	svr.GET("/api/clients", s.httpShowClients)
 	svr.GET("/api/clients/num", s.httpCloseClient)
